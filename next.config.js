@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ['@prisma/client'],
   images: {
     remotePatterns: [
       {
@@ -11,7 +10,8 @@ const nextConfig = {
   },
   // Disable Turbopack for now
   experimental: {
-    turbo: false
+    turbo: false,
+    serverComponentsExternalPackages: ['@prisma/client']
   }
 }
 

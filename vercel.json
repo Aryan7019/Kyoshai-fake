@@ -1,12 +1,15 @@
 {
   "functions": {
     "app/**/*.js": {
-      "includeFiles": "node_modules/.prisma/client/**"
+      "includeFiles": "node_modules/.prisma/client/query-engine-rhel-openssl-3.0.x"
+    },
+    "pages/**/*.js": {
+      "includeFiles": "node_modules/.prisma/client/query-engine-rhel-openssl-3.0.x"
     }
   },
   "build": {
     "env": {
-      "PRISMA_CLI_BINARY_TARGETS": "rhel-openssl-3.0.x"
+      "PRISMA_GENERATE_DATAPROXY": "false"
     }
   }
 }
