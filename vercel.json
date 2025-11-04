@@ -1,9 +1,1 @@
-{
-  "buildCommand": "prisma generate && next build",
-  "installCommand": "npm ci",
-  "functions": {
-    "app/**/*.js": {
-      "includeFiles": "node_modules/.prisma/client/libquery_engine-*.so.node"
-    }
-  }
-}
+{}
