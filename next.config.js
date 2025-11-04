@@ -12,12 +12,6 @@ const nextConfig = {
   // Disable Turbopack for now
   experimental: {
     turbo: false
-  },
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals.push('@prisma/client')
-    }
-    return config
   }
 }
 
