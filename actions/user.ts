@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { IndustryInsight, User, MarketOutlook, DemandLevel } from "@prisma/client";
+import { IndustryInsight, User, MarketOutlook, DemandLevel, Prisma } from "@prisma/client";
 import { _success } from "zod/v4/core";
 import { generateAIInsight } from "./dashboard";
 
@@ -19,7 +19,7 @@ export async function updateUser(data: User) {
   if (!user) throw new Error("User not found");
 
   try {
-    const result = await db.$transaction(async (tx) => {
+    const result = await db.$transaction(async (tx: Prisma.TransactionClient) => {
       // Only process industry insight if industry is provided
       let industryInsight = null;
 
