@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
+    "vercel-build": "prisma generate && next build",
     "vercel-build": "PRISMA_GENERATE_DATAPROXY=false prisma generate && next build",
     "db:studio": "dotenv -e .env -- prisma studio",
     "db:generate": "dotenv -e .env -- prisma generate",
