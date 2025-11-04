@@ -1,16 +1,1 @@
-{
-  "buildCommand": "prisma generate && next build",
-  "build": {
-    "env": {
-      "PRISMA_GENERATE_DATAPROXY": "false"
-    }
-  },
-  "env": {
-    "PRISMA_GENERATE_DATAPROXY": "false"
-  },
-  "functions": {
-    "app/**/*.js": {
-      "includeFiles": "node_modules/.prisma/client/libquery_engine-rhel-openssl-3.0.x.so.node"
-    }
-  }
-}
+{}
