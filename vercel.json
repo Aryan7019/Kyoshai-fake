@@ -1,15 +1,1 @@
-{
-  "functions": {
-    "app/**/*.js": {
-      "includeFiles": "node_modules/.prisma/client/query-engine-rhel-openssl-3.0.x"
-    },
-    "pages/**/*.js": {
-      "includeFiles": "node_modules/.prisma/client/query-engine-rhel-openssl-3.0.x"
-    }
-  },
-  "build": {
-    "env": {
-      "PRISMA_GENERATE_DATAPROXY": "false"
-    }
-  }
-}
+{}
