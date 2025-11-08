@@ -175,56 +175,57 @@ const ResumeBuilder = ({ initialContent }: any) => {
                         body { 
                             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                             line-height: 1.5; 
-                            color: #2d3748; 
+                            color: #000000; 
                             background: white;
                             padding: 50px 40px;
-                            font-size: 11px;
+                            font-size: 14px;
                             font-weight: 400;
                         }
                         
                         h1 { 
-                            font-size: 32px; 
-                            font-weight: 700; 
+                            font-size: 36px; 
+                            font-weight: bold; 
                             margin: 0 0 8px 0; 
                             text-align: center;
-                            color: #1a202c;
+                            color: #000000;
                             letter-spacing: -0.5px;
                         }
                         
                         h2 { 
-                            font-size: 18px; 
-                            font-weight: 600; 
+                            font-size: 20px; 
+                            font-weight: bold; 
                             margin: 24px 0 12px 0; 
-                            color: #2d3748;
+                            color: #000000;
                             text-transform: uppercase;
                             letter-spacing: 0.5px;
-                            border-bottom: 2px solid #4299e1;
+                            border-bottom: 2px solid #000000;
                             padding-bottom: 4px;
                         }
                         
                         h3 { 
-                            font-size: 14px; 
-                            font-weight: 600; 
+                            font-size: 16px; 
+                            font-weight: bold; 
                             margin: 16px 0 6px 0; 
-                            color: #2d3748;
+                            color: #000000;
                         }
                         
                         p { 
                             margin: 6px 0; 
                             line-height: 1.6;
-                            color: #4a5568;
+                            color: #000000;
+                            font-size: 14px;
                         }
                         
                         .contact-info {
                             text-align: center;
                             margin: 16px 0 32px 0;
-                            font-size: 12px;
-                            color: #718096;
+                            font-size: 15px;
+                            color: #000000;
                             line-height: 1.4;
                         }
                         
                         a {
-                            color: #4299e1;
+                            color: #000000;
                             text-decoration: none;
                             font-weight: 500;
                         }
@@ -234,13 +235,13 @@ const ResumeBuilder = ({ initialContent }: any) => {
                         }
                         
                         strong { 
-                            font-weight: 600; 
-                            color: #2d3748;
+                            font-weight: bold; 
+                            color: #000000;
                         }
                         
                         em { 
                             font-style: italic; 
-                            color: #4a5568;
+                            color: #000000;
                         }
                         
                         ul, ol { 
@@ -251,24 +252,27 @@ const ResumeBuilder = ({ initialContent }: any) => {
                         li { 
                             margin: 3px 0; 
                             line-height: 1.5;
+                            font-size: 14px;
+                            color: #000000;
                         }
                         
                         .job-title {
                             font-weight: 600;
-                            color: #2d3748;
-                            font-size: 13px;
+                            color: #000000;
+                            font-size: 15px;
                         }
                         
                         .job-date {
-                            color: #718096;
-                            font-size: 11px;
+                            color: #000000;
+                            font-size: 13px;
                             font-style: italic;
                             margin: 2px 0 8px 0;
                         }
                         
                         .job-description {
                             margin-left: 0;
-                            color: #4a5568;
+                            color: #000000;
+                            font-size: 14px;
                         }
                         
                         /* Center contact info properly */
@@ -655,10 +659,6 @@ const ResumeBuilder = ({ initialContent }: any) => {
                         />
 
                     </div>
-
-
-
-
                 </TabsContent>
             </Tabs>
         </div>
