@@ -1,12 +1,12 @@
 generator client {
   provider = "prisma-client-js"
   binaryTargets = ["native"]
-  engineType = "library"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 model User {
   id            String    @id @default(uuid())
@@ -49,6 +49,7 @@ model Resume {
   userId      String    @unique    // One resume per user
   user        User      @relation(fields: [userId], references: [id])
   content     String    @db.Text // Markdown content
+  formData    String?   @db.Text // JSON string of form data (contact, experience, education, etc.)
   atsScore    Float?
   feedback    String?
   createdAt   DateTime  @default(now())

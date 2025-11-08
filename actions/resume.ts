@@ -8,35 +8,66 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 const model = genAI.getGenerativeModel({
     model: "gemini-2.5-flash-preview-09-2025"
 })
-export async function saveResume(content: any) {
-    const { userId } = await auth();
-    if (!userId) throw new Error("User not authenticated");
-
-    const user = await db.user.findUnique({
-        where: {
-            clerkUserId: userId
-        }
-    });
-
-    if (!user) throw new Error("User not found");
+export async function saveResume(content: any, formData?: any) {
     try {
+        const { userId } = await auth();
+        if (!userId) {
+            console.error("No userId from auth");
+            throw new Error("User not authenticated");
+        }
+
+        console.log("Authenticated user:", userId);
+
+        const user = await db.user.findUnique({
+            where: {
+                clerkUserId: userId
+            }
+        });
+
+        if (!user) {
+            console.error("User not found in database for clerkUserId:", userId);
+            throw new Error("User not found");
+        }
+
+        console.log("Found user in DB:", user.id);
+
+        const updateData: any = {
+            userId: user.id,
+            content: content || ""
+        };
+
+        // Save form data as JSON string if provided
+        if (formData) {
+            try {
+                updateData.formData = JSON.stringify(formData);
+                console.log("FormData stringified, length:", updateData.formData.length);
+            } catch (jsonError: any) {
+                console.error("Error stringifying formData:", jsonError);
+                throw new Error("Invalid form data format");
+            }
+        }
+
+        console.log("Attempting upsert for userId:", user.id);
+        console.log("Content length:", content?.length || 0);
+
         const resume = await db.resume.upsert({
             where: {
                 userId: user.id
             },
-            update: {
-                userId: user.id,
-                content
-            },
-            create: {
-                userId: user.id,
-                content
-            }
+            update: updateData,
+            create: updateData
         })
+        
+        console.log("Resume saved successfully:", resume.id);
         revalidatePath("/resume")
+        return { success: true, resume };
     } catch (error: any) {
-        console.log("Error saving resume:", error.message);
-        throw new Error("Failed to save resume");
+        console.error("=== SAVE RESUME ERROR ===");
+        console.error("Error type:", error.constructor.name);
+        console.error("Error message:", error.message);
+        console.error("Error stack:", error.stack);
+        console.error("========================");
+        throw error;
     }
 }
 

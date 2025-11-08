@@ -27,13 +27,16 @@ const MDEditor = dynamic(
 )
 
 
-const ResumeBuilder = ({ initialContent }: any) => {
+const ResumeBuilder = ({ initialContent, initialFormData }: any) => {
     const [activeTab, setActiveTab] = useState("edit")
     const [resumeMode, setResumeMode] = useState("preview")
     const [previewContent, setPreviewContent] = useState(initialContent || "")
     const [isGenerating, setIsGenerating] = useState(false)
     const [isMounted, setIsMounted] = useState(false)
     const { user } = useUser();
+
+    // Parse initial form data if it exists
+    const parsedFormData = initialFormData ? JSON.parse(initialFormData) : null;
 
     // Ensure component is mounted on client side
     useEffect(() => {
@@ -43,7 +46,7 @@ const ResumeBuilder = ({ initialContent }: any) => {
         control, register, watch, formState: { errors }
     } = useForm({
         resolver: zodResolver(resumeSchema),
-        defaultValues: {
+        defaultValues: parsedFormData || {
             contactInfo: {
                 email: "",
                 mobile: "",
@@ -67,17 +70,39 @@ const ResumeBuilder = ({ initialContent }: any) => {
     } = useFetch(saveResume)
 
     const formValues = watch()
+    
     useEffect(() => {
-        if (initialContent) setActiveTab("preview");
-    }, [initialContent])
+        // If there's saved content and no form data, show preview tab
+        if (initialContent && !initialFormData) {
+            setActiveTab("preview");
+        }
+        // If there's saved form data, stay on edit tab to show the form
+        if (initialFormData) {
+            setActiveTab("edit");
+        }
+    }, [initialContent, initialFormData])
 
     useEffect(() => {
         if (activeTab === "edit") {
             const newContent = getCombinedContent();
-            setPreviewContent(newContent ? newContent : initialContent)
+            setPreviewContent(newContent || initialContent || "")
         }
-
     }, [formValues, activeTab])
+
+    // Auto-save disabled - user must click Save button manually
+    // useEffect(() => {
+    //     if (formValues && isMounted && activeTab === "edit") {
+    //         const timeoutId = setTimeout(async () => {
+    //             try {
+    //                 const content = getCombinedContent();
+    //                 await saveResumeFn(content, formValues);
+    //             } catch (error) {
+    //                 console.error("Auto-save error:", error);
+    //             }
+    //         }, 3000);
+    //         return () => clearTimeout(timeoutId);
+    //     }
+    // }, [formValues, isMounted, activeTab])
     useEffect(() => {
         if (saveResult && !isSaving) {
             toast.success("Resume saved successfully!");
@@ -99,8 +124,8 @@ const ResumeBuilder = ({ initialContent }: any) => {
         if (contactInfo?.leetcode) parts.push(`[LeetCode](${contactInfo.leetcode})`);
 
         return parts.length > 0
-            ? `# ${user?.fullName || 'Your Name'}\n\n<div align="center">\n${parts.join(" | ")}\n</div>`
-            : `# ${user?.fullName || 'Your Name'}`;
+            ? `<div align="center">\n\n# ${user?.fullName || 'Your Name'}\n\n${parts.join(" | ")}\n\n</div>`
+            : `<div align="center">\n\n# ${user?.fullName || 'Your Name'}\n\n</div>`;
     }
 
     const getCombinedContent = () => {
@@ -119,15 +144,16 @@ const ResumeBuilder = ({ initialContent }: any) => {
 
     const onSubmit = async () => {
         try {
-            const formattedContent = previewContent
-                .replace(/\n/g, "\n") // Normalize newlines
-                .replace(/\n\s*\n/g, "\n\n") // Normalize multiple newlines to double newlines
-                .trim();
-
-            console.log(previewContent, formattedContent);
-            await saveResumeFn(previewContent);
-        } catch (error) {
+            const content = activeTab === "edit" ? getCombinedContent() : previewContent;
+            
+            console.log("Saving resume with content length:", content.length);
+            console.log("Form data:", formValues);
+            
+            // Save both content and form data
+            await saveResumeFn(content, formValues);
+        } catch (error: any) {
             console.error("Save error:", error);
+            toast.error(error?.message || "Failed to save resume");
         }
     };
     const generatePDF = async () => {
@@ -449,10 +475,9 @@ const ResumeBuilder = ({ initialContent }: any) => {
                                         {...register("contactInfo.email")}
                                         type="email"
                                         placeholder="your@email.com"
-                                        aria-invalid={!!errors.contactInfo?.email}
                                     />
-                                    {errors.contactInfo?.email && (
-                                        <p className="text-sm text-red-600 ">{errors.contactInfo.email.message}</p>
+                                    {errors.contactInfo && 'email' in errors.contactInfo && errors.contactInfo.email?.message && (
+                                        <p className="text-sm text-red-600 ">{String(errors.contactInfo.email.message)}</p>
                                     )}
                                 </div>
                                 <div className='space-y-2'>
@@ -461,10 +486,9 @@ const ResumeBuilder = ({ initialContent }: any) => {
                                         {...register("contactInfo.mobile")}
                                         type="tel"
                                         placeholder="+1 234 567 8900"
-                                        aria-invalid={!!errors.contactInfo?.mobile}
                                     />
-                                    {errors.contactInfo?.mobile && (
-                                        <p className="text-sm text-red-600 ">{errors.contactInfo.mobile.message}</p>
+                                    {errors.contactInfo && 'mobile' in errors.contactInfo && errors.contactInfo.mobile?.message && (
+                                        <p className="text-sm text-red-600 ">{String(errors.contactInfo.mobile.message)}</p>
                                     )}
                                 </div>
                                 <div className='space-y-2'>
@@ -473,10 +497,9 @@ const ResumeBuilder = ({ initialContent }: any) => {
                                         {...register("contactInfo.linkedin")}
                                         type="url"
                                         placeholder="https://linkedin.com/in/your-profile"
-                                        aria-invalid={!!errors.contactInfo?.linkedin}
                                     />
-                                    {errors.contactInfo?.linkedin && (
-                                        <p className="text-sm text-red-600 ">{errors.contactInfo.linkedin.message}</p>
+                                    {errors.contactInfo && 'linkedin' in errors.contactInfo && errors.contactInfo.linkedin?.message && (
+                                        <p className="text-sm text-red-600 ">{String(errors.contactInfo.linkedin.message)}</p>
                                     )}
                                 </div>
                                 <div className='space-y-2'>
@@ -485,10 +508,9 @@ const ResumeBuilder = ({ initialContent }: any) => {
                                         {...register("contactInfo.github")}
                                         type="url"
                                         placeholder="https://github.com/your-profile"
-                                        aria-invalid={!!errors.contactInfo?.github}
                                     />
-                                    {errors.contactInfo?.github && (
-                                        <p className="text-sm text-red-600 ">{errors.contactInfo.github.message}</p>
+                                    {errors.contactInfo && 'github' in errors.contactInfo && errors.contactInfo.github?.message && (
+                                        <p className="text-sm text-red-600 ">{String(errors.contactInfo.github.message)}</p>
                                     )}
                                 </div>
                                 <div className='space-y-2'>
@@ -497,10 +519,9 @@ const ResumeBuilder = ({ initialContent }: any) => {
                                         {...register("contactInfo.twitter")}
                                         type="url"
                                         placeholder="https://twitter.com/your-handle"
-                                        aria-invalid={!!errors.contactInfo?.twitter}
                                     />
-                                    {errors.contactInfo?.twitter && (
-                                        <p className="text-sm text-red-600 ">{errors.contactInfo.twitter.message}</p>
+                                    {errors.contactInfo && 'twitter' in errors.contactInfo && errors.contactInfo.twitter?.message && (
+                                        <p className="text-sm text-red-600 ">{String(errors.contactInfo.twitter.message)}</p>
                                     )}
                                 </div>
                                 <div className='space-y-2'>
@@ -509,10 +530,9 @@ const ResumeBuilder = ({ initialContent }: any) => {
                                         {...register("contactInfo.leetcode")}
                                         type="url"
                                         placeholder="https://leetcode.com/your-profile"
-                                        aria-invalid={!!errors.contactInfo?.leetcode}
                                     />
-                                    {errors.contactInfo?.leetcode && (
-                                        <p className="text-sm text-red-600 ">{errors.contactInfo.leetcode.message}</p>
+                                    {errors.contactInfo && 'leetcode' in errors.contactInfo && errors.contactInfo.leetcode?.message && (
+                                        <p className="text-sm text-red-600 ">{String(errors.contactInfo.leetcode.message)}</p>
                                     )}
                                 </div>
 
@@ -539,7 +559,7 @@ const ResumeBuilder = ({ initialContent }: any) => {
                                 )}
                             />
                             {errors.summary && (
-                                <p className="text-sm text-red-600 ">{errors.summary.message}</p>
+                                <p className="text-sm text-red-600 ">{String(errors.summary.message || '')}</p>
                             )}
                         </div>
                         {/* skills */}
@@ -561,7 +581,7 @@ const ResumeBuilder = ({ initialContent }: any) => {
                                 )}
                             />
                             {errors.skills && (
-                                <p className="text-sm text-red-600 ">{errors.skills.message}</p>
+                                <p className="text-sm text-red-600 ">{String(errors.skills.message || '')}</p>
                             )}
                         </div>
                         {/* experience */}
@@ -581,7 +601,7 @@ const ResumeBuilder = ({ initialContent }: any) => {
                                 )}
                             />
                             {errors.experience && (
-                                <p className="text-sm text-red-600 ">{errors.experience.message}</p>
+                                <p className="text-sm text-red-600 ">{String(errors.experience.message || '')}</p>
                             )}
                         </div>
                         {/* education */}
@@ -602,7 +622,7 @@ const ResumeBuilder = ({ initialContent }: any) => {
                                 )}
                             />
                             {errors.education && (
-                                <p className="text-sm text-red-600 ">{errors.education.message}</p>
+                                <p className="text-sm text-red-600 ">{String(errors.education.message || '')}</p>
                             )}
                         </div>
                         {/* PROJECTS */}
@@ -622,7 +642,7 @@ const ResumeBuilder = ({ initialContent }: any) => {
                                 )}
                             />
                             {errors.projects && (
-                                <p className="text-sm text-red-600 ">{errors.projects.message}</p>
+                                <p className="text-sm text-red-600 ">{String(errors.projects.message || '')}</p>
                             )}
                         </div>
 
